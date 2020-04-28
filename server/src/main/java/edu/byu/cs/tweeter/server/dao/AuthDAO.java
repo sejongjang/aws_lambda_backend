@@ -2,28 +2,30 @@ package edu.byu.cs.tweeter.server.dao;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.model.*;
+import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.service.response.LogoutResponse;
+import edu.byu.cs.tweeter.model.service.response.UserResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import static com.amazonaws.regions.Regions.US_WEST_2;
 
 public class AuthDAO {
 
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public AuthDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public LogoutResponse signOut(String alias) {
-    return tempFacade.signOutUserMileStone3(alias);
+    return mileStone3Facade.signOutUserMileStone3(alias);
   }
 
   public boolean validateToken(String token) {
@@ -51,6 +53,39 @@ public class AuthDAO {
     return new LogoutResponse(true, alias + " successfully signed out");
   }
 
+  public String getTimeStamp(String requestedAlias){
+    Table table = db.getTable(TABLE_NAME);
+
+    HashMap<String, Object> valueMap = new HashMap<>();
+    valueMap.put(":alias", requestedAlias);
+
+    QuerySpec querySpec = new QuerySpec()
+      .withKeyConditionExpression("alias = :alias")
+      .withValueMap(valueMap)
+      .withScanIndexForward(false);
+
+    ItemCollection<QueryOutcome> items = null;
+
+    try {
+      items = table.query(querySpec);
+      Iterator<Item> iterator = items.iterator();
+      iterator.hasNext();
+
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+
+    if(items == null) return null;
+
+    QueryOutcome outcome = items.getLastLowLevelResult();
+    if(outcome == null) return null;
+
+    Item item = outcome.getItems().get(0);
+    return item.getString("time");
+  }
+
+
+
   public void registerValidAuth(String auth, String alias){
     Table table = db.getTable(TABLE_NAME);
 
@@ -58,6 +93,7 @@ public class AuthDAO {
       PutItemOutcome putItemOutcome = table.putItem(new Item()
         .withPrimaryKey(PRIMARY_KEY, alias)
         .with(AUTH, auth)
+        .withLong("time", System.currentTimeMillis()+20*60*1000)
       );
     } catch (Exception e) {
       System.err.println(e.getMessage());

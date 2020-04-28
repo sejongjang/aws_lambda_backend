@@ -22,7 +22,6 @@ public class TweetImpl implements TweetService {
       SendMessageRequest sendMessageRequest = new SendMessageRequest().withQueueUrl(SQSURL).withMessageBody(item);
       AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
       SendMessageResult sendMessageResult = sqs.sendMessage(sendMessageRequest);
-
     }
     catch (Exception e){
       return new TweetResponse(false, e.getMessage());

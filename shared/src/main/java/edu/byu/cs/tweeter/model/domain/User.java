@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.model.domain;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -8,13 +9,13 @@ import java.util.Objects;
  */
 public class User implements Comparable<User> {
 
-    public String firstName;
-    public String lastName;
-    public String alias;
-    public String imageUrl;
-    public String password;
-    public String username;
-    public ArrayList<Story> tweets;
+    private String firstName;
+    private String lastName;
+    private String alias;
+    private String imageUrl;
+    private String password;
+    //    private String username;
+    private List<Story> tweets;
 
     public User() {
     }
@@ -36,12 +37,22 @@ public class User implements Comparable<User> {
         }
     }
 
-    public String getUsername() {
-        return username;
-    }
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
-    public void setUsername(String username) {
-        this.username = username;
+
+    public void setAlias(String alias) {
+        if (alias.contains("@")){
+            this.alias = alias;
+        }
+        else {
+            this.alias = String.format("@%s", alias);
+        }
     }
 
     public void setPassword(String password) {
@@ -104,5 +115,13 @@ public class User implements Comparable<User> {
     public void addTweet(Story tweet){
         if(tweets == null) tweets = new ArrayList<>();
         tweets.add(tweet);
+    }
+
+    public List<Story> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Story> tweets) {
+        this.tweets = tweets;
     }
 }

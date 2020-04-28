@@ -18,14 +18,14 @@ import java.util.Iterator;
 import java.util.List;
 
 public class FeedDAO {
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public FeedDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public FeedResponse getFeed(FeedRequest request) {
-    return tempFacade.getFeedsMileStone3(request);
+    return mileStone3Facade.getFeedsMileStone3(request);
   }
 
   // milestone 4

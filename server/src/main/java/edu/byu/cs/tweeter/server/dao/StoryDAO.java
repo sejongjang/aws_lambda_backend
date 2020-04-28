@@ -14,16 +14,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class StoryDAO {
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public StoryDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public StoryResponse getStories(StoryRequest request){
-    return tempFacade.getStoriesMileStone3(request);
+    return mileStone3Facade.getStoriesMileStone3(request);
   }
 
 
@@ -48,7 +49,22 @@ public class StoryDAO {
 
   private static final String STORY_INDEX = "story-index";
 
+  private boolean checkValidAuth(StoryRequest request){
+    AuthDAO authDAO = new AuthDAO();
+    String timeStamp = authDAO.getTimeStamp(request.getUser().getAlias());
+    if(timeStamp == null) return false;
+
+    long minutes = TimeUnit.MILLISECONDS.toMinutes(Long.parseLong(timeStamp) - System.currentTimeMillis() + 20 * 60 * 1000);
+
+    if(minutes<2) return true;
+
+    return false;
+  }
+
   public StoryResponse getStoriesMileStone4(StoryRequest request){
+
+    if(!checkValidAuth(request)) return new StoryResponse("token is expired, try login again");
+
     boolean hasMorePages= false;
     Table table = db.getTable(TABLE_NAME);
 

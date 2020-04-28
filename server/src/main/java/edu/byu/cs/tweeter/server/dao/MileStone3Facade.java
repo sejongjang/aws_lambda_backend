@@ -11,9 +11,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-public class TempFacade {
+public class MileStone3Facade {
 
-  private static TempFacade instance;
+  private static MileStone3Facade instance;
   private static Map<User, List<User>> followingMap;
   private static Map<User, List<User>> followersMap;
   private static List<Follow> follows;
@@ -39,9 +39,9 @@ public class TempFacade {
   final User testUser = new User("Test", "User", "@Test User", url);
   final User testUser2 = new User("Test", "User2", "@Test User2", url);
 
-  public static TempFacade getInstance() {
+  public static MileStone3Facade getInstance() {
     if(instance == null) {
-      instance = new TempFacade();
+      instance = new MileStone3Facade();
     }
 
     return instance;
@@ -95,7 +95,7 @@ public class TempFacade {
     return follows;
   }
 
-  private TempFacade(){
+  private MileStone3Facade(){
     setFakeFollowing();
     setFakeFollwer();
 
@@ -109,7 +109,7 @@ public class TempFacade {
     setAllMockUsers();
     mockUserList = new ArrayList<>();
     mockUserList.addAll(allMockUsers);
-    testUser.setUsername("123");
+    testUser.setAlias("123");
     try {
       testUser.setPassword(encrypt("123"));
     } catch (NoSuchAlgorithmException e) {

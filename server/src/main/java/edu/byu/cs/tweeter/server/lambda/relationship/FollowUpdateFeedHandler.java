@@ -41,12 +41,22 @@ public class FollowUpdateFeedHandler implements RequestHandler<SQSEvent, Void> {
 
         List<Item> items = new ArrayList<>();
 
-        for(Story story : stories){
-          Item item = getItem(story, source);
+        for(int i =0; i<stories.size(); ++i){
+          Item item = getItem(stories.get(i), source);
           items.add(item);
+
+          if(stories.size() -1 == i){
+            feedDAO.updateFeed(items);
+            items.clear();
+          }
+          else if(items.size() == 15){
+            feedDAO.updateFeed(items);
+            items.clear();
+          }
+
         }
 
-        feedDAO.updateFeed(items);
+//        feedDAO.updateFeed(items);
       }
     }
 

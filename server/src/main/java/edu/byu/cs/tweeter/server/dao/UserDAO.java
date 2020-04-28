@@ -24,22 +24,22 @@ public class UserDAO {
 
 
   // milestone 3
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public UserDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public LoginResponse loginUser(LoginRequest request){
-    return tempFacade.loginUserMileStone3(request);
+    return mileStone3Facade.loginUserMileStone3(request);
   }
 
   public LoginResponse registerUser(SignUpRequest request){
-    return tempFacade.registerUserMileStone3(request);
+    return mileStone3Facade.registerUserMileStone3(request);
   }
 
   public UserResponse findUserByAlias(String alias){
-    return tempFacade.findUserByAliasMileStone3(alias);
+    return mileStone3Facade.findUserByAliasMileStone3(alias);
   }
 
 

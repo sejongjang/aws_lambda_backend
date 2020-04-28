@@ -13,6 +13,7 @@ import edu.byu.cs.tweeter.server.json.Serializer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Stack;
 
 public class UpdateFeedHandler implements RequestHandler<SQSEvent, Void> {
   public FeedDAO feedDAO = new FeedDAO();
@@ -34,12 +35,20 @@ public class UpdateFeedHandler implements RequestHandler<SQSEvent, Void> {
         List<User> followers = storyFollowers.getUsers();
         List<Item> items = new ArrayList<>();
 
-        for(User follower : followers){
-          Item item = getItem(story, follower);
+        for(int i=0; i<followers.size(); ++i){ //User follower : followers
+          Item item = getItem(story, followers.get(i));
           items.add(item);
-        }
 
-        feedDAO.updateFeed(items);
+          if(followers.size() -1 == i){
+            feedDAO.updateFeed(items);
+            items.clear();
+          }
+          else if(items.size() == 24){
+            feedDAO.updateFeed(items);
+            items.clear();
+          }
+        }
+//        feedDAO.updateFeed(items);
       }
     }
 
@@ -48,12 +57,51 @@ public class UpdateFeedHandler implements RequestHandler<SQSEvent, Void> {
 
   private Item getItem(Story story, User user){
 
+    String firstname = "";
+    firstname = story.getUser().getFirstName();
+
+    String lastname = "";
+    lastname = story.getUser().getLastName();
+
+    String url = "";
+    url = story.getUser().getImageUrl();
+
     return new Item().withPrimaryKey(FOLLOWER, user.getAlias(), TIME_STAMP, story.getTimeStamp())
       .withString(MESSAGE, story.getMessage())
       .withString(STORY_IMAGE_URL, story.getImageUri())
-      .withString("story_owner_first_name", story.getUser().getFirstName())
-      .withString("story_owner_last_name", story.getUser().getLastName())
+      .withString("story_owner_first_name", firstname)
+      .withString("story_owner_last_name", lastname)
       .withString("story_owner_alias", story.getUser().getAlias())
-      .withString("story_owner_url", story.getUser().getImageUrl());
+      .withString("story_owner_url", url);
   }
+
+//  public class StackArrayList<T> implements Stack<T> {
+//
+//    private List<T> arrList;
+//
+//    private int total;
+//
+//    public StackArrayList()
+//    {
+//      arrList = new ArrayList<T>();
+//    }
+//
+//    public StackArrayList<T> push(T ele)
+//    {
+//      arrList.add(ele);
+//      return this;
+//    }
+//
+//    public T pop()
+//    {
+//      if (total == 0) throw new java.util.NoSuchElementException();
+//      return arrList.remove(arrList.size()-1);
+//    }
+//
+//    @Override
+//    public String toString()
+//    {
+//      return java.util.Arrays.toString(new List[]{arrList});
+//    }
+//  }
 }

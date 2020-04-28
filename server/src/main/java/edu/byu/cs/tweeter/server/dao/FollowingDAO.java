@@ -16,18 +16,18 @@ import static com.amazonaws.regions.Regions.US_WEST_2;
 
 public class FollowingDAO {
 
-    private TempFacade tempFacade;
+    private MileStone3Facade mileStone3Facade;
 
     public FollowingDAO(){
-        tempFacade = TempFacade.getInstance();
+        mileStone3Facade = MileStone3Facade.getInstance();
     }
 
     public FollowingResponse getFollowees(FollowingRequest request){
-        return tempFacade.getFollowingMileStone3(request);
+        return mileStone3Facade.getFollowingMileStone3(request);
     }
 
     public FollowingResponse getFollowers(FollowingRequest request){
-        return tempFacade.getFollowersMileStone3(request);
+        return mileStone3Facade.getFollowersMileStone3(request);
     }
 
     FollowGenerator getFollowGenerator() {
@@ -70,7 +70,11 @@ public class FollowingDAO {
 
         ItemCollection<QueryOutcome> items = null;
 
+        if(request.limit > 0) querySpec.withMaxPageSize(request.limit);
+        if(request.getLastFollowee() != null) querySpec.withExclusiveStartKey(FOLLOWEE_HANDLE, request.getFollower().getAlias(), FOLLOWER_HANDLE, request.getLastFollowee().getAlias());
+
         try {
+            //follows_index
             items = table.getIndex("follows_index").query(querySpec);
             Iterator<Item> iterator = items.iterator();
             iterator.hasNext();

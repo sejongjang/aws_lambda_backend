@@ -8,21 +8,32 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import edu.byu.cs.tweeter.model.domain.Story;
 import edu.byu.cs.tweeter.model.service.request.TweetRequest;
 import edu.byu.cs.tweeter.model.service.response.TweetResponse;
+import org.apache.commons.codec.binary.Base64;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.UUID;
 
 public class TweetDAO {
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public TweetDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public TweetResponse postTweet(TweetRequest tweetRequest){
-    return tempFacade.postMileStone3(tweetRequest);
+    return mileStone3Facade.postMileStone3(tweetRequest);
   }
 
   private AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_WEST_2).build();
@@ -37,15 +48,16 @@ public class TweetDAO {
   private static final String DATE = "date";
   private static final String STORY_IMAGE_URL = "url";
 
+  private static final String S3_CONTENT_TYPE = "image/png";
+
   public TweetResponse postTweetMileStone4(TweetRequest tweetRequest){
     Story story = tweetRequest.getStory();
 
     try {
-//      PutItemOutcome outcome = table
-//        .putItem(new Item().withPrimaryKey(
-//          STORY_OWNER, story.getUser().getAlias(),
-//          TIME_STAMP, story.getTimeStamp()).withString(MESSAGE, story.getMessage())
-//        );
+//      if(tweetRequest.getStory().imageUri != null && !tweetRequest.getStory().imageUri.equals("empty uri")){
+//        String imageFromBucket = imageFromS3(tweetRequest);
+//        story.setImageUri(imageFromBucket);
+//      }
 
       PutItemOutcome putItemOutcome = table.putItem(
         new Item().withPrimaryKey(STORY_OWNER, story.getUser().getAlias())
@@ -63,6 +75,25 @@ public class TweetDAO {
     }
 
     return new TweetResponse(true, "success postMileStone3 tweet " + story.getMessage());
+  }
+
+  public String imageFromS3(TweetRequest request){
+    String imageUrl = request.getStory().imageUri;
+    String alias = request.getStory().getUser().getAlias();
+    AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_WEST_2).build();
+
+    byte[] bytes = Base64.decodeBase64(imageUrl);
+    ObjectMetadata metadata = new ObjectMetadata();
+    metadata.setContentLength(bytes.length);
+    metadata.setContentType(S3_CONTENT_TYPE);
+
+    String sourceKey = alias + String.valueOf(Math.abs(new Random().nextInt()));
+    InputStream inputStream = new ByteArrayInputStream(bytes);
+    PutObjectRequest putObjectRequest = new PutObjectRequest("cs340aws", sourceKey , inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead);
+    s3.putObject(putObjectRequest);
+
+    AmazonS3Client amazonS3Client = new AmazonS3Client();
+    return amazonS3Client.getResourceUrl("cs340aws", sourceKey);
   }
 
   public void dropTable() throws DataAccessException {

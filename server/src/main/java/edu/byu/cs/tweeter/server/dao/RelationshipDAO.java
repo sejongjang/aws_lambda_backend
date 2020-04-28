@@ -15,22 +15,22 @@ import edu.byu.cs.tweeter.model.service.response.RelationshipResponse;
 import static com.amazonaws.regions.Regions.US_WEST_2;
 
 public class RelationshipDAO {
-  private TempFacade tempFacade;
+  private MileStone3Facade mileStone3Facade;
 
   public RelationshipDAO(){
-    tempFacade = TempFacade.getInstance();
+    mileStone3Facade = MileStone3Facade.getInstance();
   }
 
   public RelationshipResponse getIsRelated(RelationshipRequest request){
-    return tempFacade.isRelatedMileStone3(request);
+    return mileStone3Facade.isRelatedMileStone3(request);
   }
 
   public RelationshipResponse follow(RelationshipRequest request) {
-    return tempFacade.followMileStone3(request);
+    return mileStone3Facade.followMileStone3(request);
   }
 
   public RelationshipResponse unfollow(RelationshipRequest request) {
-    return tempFacade.unfollowMileStone3(request);
+    return mileStone3Facade.unfollowMileStone3(request);
   }
 
   // milestone4
@@ -77,6 +77,26 @@ public class RelationshipDAO {
     if(request.getSource() != null) source = request.getSource();
     if(request.getDestination() != null) destination = request.getDestination();
 
+//    User supserStar = new User("Iam", "superstar", "superstar", "https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png");
+//    for(int i=0; i<10000; ++i){
+//      User sourceUser = new User("person"+i, "test"+i, "follower"+i, "https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png");
+//      try {
+//        PutItemOutcome putItemOutcome = table.putItem(new Item()
+//          .withPrimaryKey(FOLLOWER_HANDLE, sourceUser.getAlias())
+//          .with(FOLLOWEE_HANDLE, supserStar.getAlias())
+//          .with(FOLLOWER_FIRST_NAME, sourceUser.getFirstName())
+//          .with(FOLLOWER_LAST_NAME, sourceUser.getLastName())
+//          .with(FOLLOWEE_FIRST_NAME, supserStar.getFirstName())
+//          .with(FOLLOWEE_LAST_NAME, supserStar.getLastName())
+//          .with(FOLLOWER_PROFILE_URL, sourceUser.getImageUrl())
+//          .with(FOLLOWEE_PROFILE_URL, supserStar.getImageUrl())
+//        );
+//        System.out.println(sourceUser.getAlias() + " follows " + supserStar.getAlias());
+//      }
+//      catch (Exception e){
+//        return new RelationshipResponse(false, e.getMessage());
+//      }
+//    }
     try {
       PutItemOutcome putItemOutcome = table.putItem(new Item()
         .withPrimaryKey(FOLLOWER_HANDLE, source.getAlias())
