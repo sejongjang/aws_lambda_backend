@@ -18,19 +18,19 @@ import static com.amazonaws.regions.Regions.US_WEST_2;
 
 public class AuthDAO {
 
-  private MileStone3Facade mileStone3Facade;
-
-  public AuthDAO(){
-    mileStone3Facade = MileStone3Facade.getInstance();
-  }
-
-  public LogoutResponse signOut(String alias) {
-    return mileStone3Facade.signOutUserMileStone3(alias);
-  }
-
-  public boolean validateToken(String token) {
-    return token.equals("token");
-  }
+//  private MileStone3Facade mileStone3Facade;
+//
+//  public AuthDAO(){
+//    mileStone3Facade = MileStone3Facade.getInstance();
+//  }
+//
+//  public LogoutResponse signOut(String alias) {
+//    return mileStone3Facade.signOutUserMileStone3(alias);
+//  }
+//
+//  public boolean validateToken(String token) {
+//    return token.equals("token");
+//  }
 
   // milestone4
   private static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(US_WEST_2).build();

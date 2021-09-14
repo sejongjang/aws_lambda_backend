@@ -141,7 +141,5 @@ public class Main {
 //    event.setRecords(msgs);
 //
 //    unFollowSQSHandler.handleRequest(event, null);
-
-
   }
 }
